@@ -57,7 +57,7 @@ class Resource:
         return self.dict()[item]
 
 
-class TapiAdapter(object):
+class TapiAdapter:
     serializer_class = SimpleSerializer
     api_root = NotImplementedError
     resource_mapping: dict = NotImplementedError
@@ -235,7 +235,7 @@ class TapiAdapter(object):
         raise NotImplementedError()
 
 
-class JSONAdapterMixin(object):
+class JSONAdapterMixin:
     def get_request_kwargs(self, api_params, *args, **kwargs):
         request_kwargs = super(JSONAdapterMixin, self).get_request_kwargs(
             api_params, *args, **kwargs

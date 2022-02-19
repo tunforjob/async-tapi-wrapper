@@ -11,7 +11,7 @@ import requests
 from .exceptions import ResponseProcessException
 
 
-class TapiInstantiator(object):
+class TapiInstantiator:
     def __init__(self, adapter_class):
         self.adapter_class = adapter_class
 
@@ -28,7 +28,7 @@ class TapiInstantiator(object):
         )
 
 
-class TapiClient(object):
+class TapiClient:
     def __init__(
         self,
         api,
