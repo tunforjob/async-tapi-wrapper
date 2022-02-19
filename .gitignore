@@ -5,3 +5,9 @@
 build
 dist
 *.egg-info
+
+*.pyc
+.pytest_cache
+
+venv
+.venv
