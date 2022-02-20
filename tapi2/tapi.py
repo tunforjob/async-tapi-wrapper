@@ -1,12 +1,9 @@
-from __future__ import unicode_literals
-
 import copy
 import json
+import aiohttp
 import webbrowser
 from collections import OrderedDict
 from pprint import pprint
-
-import requests
 
 from .exceptions import ResponseProcessException
 
@@ -14,9 +11,21 @@ from .exceptions import ResponseProcessException
 class TapiInstantiator:
     def __init__(self, adapter_class):
         self.adapter_class = adapter_class
+        self
 
-    def __call__(self, serializer_class=None, session=None, resource_mapping=None, **kwargs):
+    def __call__(
+        self, serializer_class=None, session=None, resource_mapping=None, **kwargs
+    ):
         refresh_token_default = kwargs.pop("refresh_token_by_default", False)
+        # async with TapiClient(
+        #     self.adapter_class(
+        #         serializer_class=serializer_class,
+        #         resource_mapping=resource_mapping,
+        #     ),
+        #     api_params=kwargs,
+        #     refresh_token_by_default=refresh_token_default,
+        #     session=session,
+        # ) as client:
         return TapiClient(
             self.adapter_class(
                 serializer_class=serializer_class,
@@ -43,7 +52,7 @@ class TapiClient:
         store=None,
         resource_name=None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         self._api = api
         self._data = data
@@ -54,8 +63,17 @@ class TapiClient:
         self._resource_name = resource_name
         self._refresh_token_default = refresh_token_by_default
         self._refresh_data = refresh_data
-        self._session = session or requests.Session()
+        self._session = session or aiohttp.ClientSession()
         self.store = store or {}
+
+    async def __aenter__(self):
+        if self._session is not None:
+            self._session = aiohttp.ClientSession()
+        return self
+
+    async def __aexit__(self, exc_type, exc_value, traceback):
+        if self._session is not None:
+            await self._session.close()
 
     @property
     def data(self):
@@ -70,8 +88,8 @@ class TapiClient:
         return self._response
 
     @property
-    def status_code(self):
-        return self.response.status_code
+    def status(self):
+        return self.response.status
 
     def _instatiate_api(self):
         serializer_class = None
@@ -83,6 +101,21 @@ class TapiClient:
         request_kwargs = kwargs.pop("request_kwargs", self._request_kwargs)
         response = kwargs.pop("response", self._response)
         resource_name = kwargs.pop("resource_name", self._resource_name)
+        # async with TapiClient(
+        #     self._instatiate_api(),
+        #     data=data,
+        #     api_params=self._api_params,
+        #     response=response,
+        #     request_kwargs=request_kwargs,
+        #     refresh_token_by_default=self._refresh_token_default,
+        #     refresh_data=self._refresh_data,
+        #     resource_name=resource_name,
+        #     session=self._session,
+        #     store=self.store,
+        #     *args,
+        #     **kwargs,
+        # ) as client:
+        #     result = await client
         return TapiClient(
             self._instatiate_api(),
             data=data,
@@ -95,11 +128,25 @@ class TapiClient:
             session=self._session,
             store=self.store,
             *args,
-            **kwargs
+            **kwargs,
         )
 
     def _wrap_in_tapi_executor(self, data, *args, **kwargs):
         request_kwargs = kwargs.pop("request_kwargs", self._request_kwargs)
+        # async with TapiClientExecutor(
+        #     self._instatiate_api(),
+        #     data=data,
+        #     api_params=self._api_params,
+        #     request_kwargs=request_kwargs,
+        #     refresh_token_by_default=self._refresh_token_default,
+        #     refresh_data=self._refresh_data,
+        #     resource_name=self._resource_name,
+        #     session=self._session,
+        #     store=self.store,
+        #     *args,
+        #     **kwargs,
+        # ) as client:
+        #     result = await client
         return TapiClientExecutor(
             self._instatiate_api(),
             data=data,
@@ -111,7 +158,7 @@ class TapiClient:
             session=self._session,
             store=self.store,
             *args,
-            **kwargs
+            **kwargs,
         )
 
     def _get_doc(self):
@@ -134,8 +181,13 @@ class TapiClient:
         url_params = self._api_params.get("default_url_params", {})
         url_params.update(kwargs)
         if self._resource and url_params:
-            data = self._api.fill_resource_template_url(self._data, url_params, self._resource_name)
+            data = self._api.fill_resource_template_url(
+                self._data, url_params, self._resource_name
+            )
 
+        # return await self._wrap_in_tapi_executor(
+        #     data, resource=self._resource, response=self._response
+        # )
         return self._wrap_in_tapi_executor(
             data, resource=self._resource, response=self._response
         )
@@ -257,6 +309,8 @@ class TapiClientExecutor(TapiClient):
             return self._api._get_to_native_method(name, self._data, **self._context())
         raise AttributeError(name)
 
+    # async def __call__(self, *args, **kwargs):
+    #     return await self._wrap_in_tapi(self._data.__call__(*args, **kwargs))
     def __call__(self, *args, **kwargs):
         return self._wrap_in_tapi(self._data.__call__(*args, **kwargs))
 
@@ -275,8 +329,8 @@ class TapiClientExecutor(TapiClient):
         return self._response
 
     @property
-    def status_code(self):
-        return self.response.status_code
+    def status(self):
+        return self.response.status
 
     @property
     def refresh_data(self):
@@ -290,10 +344,10 @@ class TapiClientExecutor(TapiClient):
             "store": self.store,
             "client": self,
             "resource_name": self._resource_name,
-            **kwargs
+            **kwargs,
         }
 
-    def _make_request(
+    async def _make_request(
         self, request_method, refresh_token=None, repeat_number=0, *args, **kwargs
     ):
         if "url" not in kwargs:
@@ -304,9 +358,9 @@ class TapiClientExecutor(TapiClient):
         )
 
         response_data = None
-        response = self._session.request(request_method, **request_kwargs)
+        response = await self._session.request(request_method, **request_kwargs)
         try:
-            response_data = self._api.process_response(
+            response_data = await self._api.process_response(
                 **self._context(response=response, request_kwargs=request_kwargs)
             )
         except ResponseProcessException as e:
@@ -314,56 +368,69 @@ class TapiClientExecutor(TapiClient):
             client = self._wrap_in_tapi(
                 e.data, response=response, request_kwargs=request_kwargs
             )
-            context = self._context(response=response, request_kwargs=request_kwargs, client=client)
+            context = self._context(
+                response=response, request_kwargs=request_kwargs, client=client
+            )
             error_message = self._api.get_error_message(data=e.data, response=response)
             tapi_exception = e.tapi_exception(message=error_message, client=client)
 
             should_refresh_token = (
                 refresh_token is not False and self._refresh_token_default
             )
-            auth_expired = self._api.is_authentication_expired(tapi_exception, **context)
+            auth_expired = self._api.is_authentication_expired(
+                tapi_exception, **context
+            )
 
             if should_refresh_token and auth_expired:
                 self._refresh_data = self._api.refresh_authentication(**context)
                 if self._refresh_data:
-                    return self._make_request(
+                    return await self._make_request(
                         request_method,
                         refresh_token=False,
                         repeat_number=repeat_number,
-                        *args, **kwargs
+                        *args,
+                        **kwargs,
                     )
 
-            if self._api.retry_request(tapi_exception, error_message, repeat_number, **context):
-                return self._make_request(
+            if self._api.retry_request(
+                tapi_exception, error_message, repeat_number, **context
+            ):
+                return await self._make_request(
                     request_method,
                     refresh_token=False,
                     repeat_number=repeat_number,
-                    *args, **kwargs
+                    *args,
+                    **kwargs,
                 )
 
-            self._api.error_handling(tapi_exception, error_message, repeat_number, **context)
+            self._api.error_handling(
+                tapi_exception, error_message, repeat_number, **context
+            )
 
+        # return await self._wrap_in_tapi(
+        #     response_data, response=response, request_kwargs=request_kwargs
+        # )
         return self._wrap_in_tapi(
             response_data, response=response, request_kwargs=request_kwargs
         )
 
-    def get(self, *args, **kwargs):
-        return self._make_request("GET", *args, **kwargs)
+    async def get(self, *args, **kwargs):
+        return await self._make_request("GET", *args, **kwargs)
 
-    def post(self, *args, **kwargs):
-        return self._make_request("POST", *args, **kwargs)
+    async def post(self, *args, **kwargs):
+        return await self._make_request("POST", *args, **kwargs)
 
-    def options(self, *args, **kwargs):
-        return self._make_request("OPTIONS", *args, **kwargs)
+    async def options(self, *args, **kwargs):
+        return await self._make_request("OPTIONS", *args, **kwargs)
 
-    def put(self, *args, **kwargs):
-        return self._make_request("PUT", *args, **kwargs)
+    async def put(self, *args, **kwargs):
+        return await self._make_request("PUT", *args, **kwargs)
 
-    def patch(self, *args, **kwargs):
-        return self._make_request("PATCH", *args, **kwargs)
+    async def patch(self, *args, **kwargs):
+        return await self._make_request("PATCH", *args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        return self._make_request("DELETE", *args, **kwargs)
+    async def delete(self, *args, **kwargs):
+        return await self._make_request("DELETE", *args, **kwargs)
 
     def _get_iterator_next_request_kwargs(self):
         return self._api.get_iterator_next_request_kwargs(
@@ -376,14 +443,10 @@ class TapiClientExecutor(TapiClient):
         )
 
     def _get_iterator_pages(self):
-        return self._api.get_iterator_pages(
-            response_data=self._data, **self._context()
-        )
+        return self._api.get_iterator_pages(response_data=self._data, **self._context())
 
     def _get_iterator_items(self):
-        return self._api.get_iterator_items(
-            data=self._data, **self._context()
-        )
+        return self._api.get_iterator_items(data=self._data, **self._context())
 
     def _reached_max_limits(self, page_count, item_count, max_pages, max_items):
         reached_page_limit = max_pages is not None and max_pages <= page_count
@@ -488,6 +551,7 @@ class TapiClientExecutor(TapiClient):
             print("Available query parameters:")
             pprint(self._resource["params"])
 
+        # return await self._wrap_in_tapi(self._resource)
         return self._wrap_in_tapi(self._resource)
 
     def __dir__(self):

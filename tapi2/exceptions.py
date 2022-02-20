@@ -7,13 +7,13 @@ class ResponseProcessException(Exception):
 
 class TapiException(Exception):
     def __init__(self, message, client):
-        self.status_code = None
+        self.status = None
         self.client = client
         if client is not None:
-            self.status_code = client().status_code
+            self.status = client().status
 
         if not message:
-            message = "response status code: {}".format(self.status_code)
+            message = "response status code: {}".format(self.status)
         super(TapiException, self).__init__(message)
 
 

@@ -2,7 +2,6 @@ from decimal import Decimal
 
 
 class BaseSerializer(object):
-
     def deserialize(self, method_name, value, **kwargs):
         if hasattr(self, method_name):
             return getattr(self, method_name)(value, **kwargs)
@@ -26,7 +25,7 @@ class BaseSerializer(object):
     def serialize(self, data):
         data_type = type(data).__name__
 
-        serialize_method = ('serialize_' + data_type).lower()
+        serialize_method = ("serialize_" + data_type).lower()
         if hasattr(self, serialize_method):
             return getattr(self, serialize_method)(data)
 

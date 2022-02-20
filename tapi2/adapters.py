@@ -148,16 +148,16 @@ class TapiAdapter:
         """Get error from response."""
         return str(data)
 
-    def process_response(self, response, request_kwargs, **kwargs):
+    async def process_response(self, response, request_kwargs, **kwargs):
         """Processing request responses."""
-        if response.status_code == 404:
+        if response.status == 404:
             raise ResponseProcessException(NotFound404Error, None)
-        elif 500 <= response.status_code < 600:
+        elif 500 <= response.status < 600:
             raise ResponseProcessException(ServerError, None)
 
-        data = self.response_to_native(response)
+        data = await self.response_to_native(response)
 
-        if 400 <= response.status_code < 500:
+        if 400 <= response.status < 500:
             raise ResponseProcessException(ClientError, data)
 
         return data
@@ -252,12 +252,11 @@ class JSONAdapterMixin:
         if data:
             return json.dumps(data)
 
-    def response_to_native(self, response):
-        if response.content.strip():
-            try:
-                return json.loads(response.content.decode())
-            except json.JSONDecodeError:
-                return response.text
+    async def response_to_native(self, response):
+        try:
+            return await response.json()
+        except json.JSONDecodeError:
+            return response.text
 
     def get_error_message(self, data, response=None):
         if not data and response.content.strip():
