@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from tapi2.adapters import TapiAdapter, JSONAdapterMixin, generate_wrapper_from_adapter
 from tapi2.serializers import SimpleSerializer
 
