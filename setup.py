@@ -13,8 +13,6 @@ with open("README.md", "r", encoding="utf8") as fh:
 
 package = "tapi2"
 
-test_requirements = ["responses>=0.5", "mock>=1.3,<1.4"]
-
 
 def get_version(package):
     """
@@ -37,7 +35,15 @@ setup(
     url="https://github.com/pavelmaksimov/tapi-wrapper",
     packages=[package],
     include_package_data=True,
-    install_requires=["requests"],
+    install_requires=["aiohttp"],
+    extras_require={
+        "dev": [
+            "black>=22.0",
+            "pytest>=7.0",
+            "pytest-asyncio>=0.18",
+            "aioresponses>=0.7",
+        ]
+    },
     license="MIT",
     zip_safe=False,
     keywords="tapi,wrapper,api",
