@@ -130,7 +130,7 @@ class TapiAdapter:
         except KeyError:
             all_keys = re.findall(r"{(.[^\}]*)", template)
             range_not_set_keys = set(all_keys) - set(params.keys())
-            not_set_keys = "', '".join(range_not_set_keys)
+            not_set_keys = "', '".join(sorted(range_not_set_keys))
 
             raise TypeError(
                 "{}() missing {} required url params: '{}'".format(

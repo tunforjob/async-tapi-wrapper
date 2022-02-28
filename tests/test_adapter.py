@@ -26,5 +26,5 @@ def test_fill_resource_template_url_exception():
 
     try:
         adapter.fill_resource_template_url(template, {}, resource)
-    except Exception as exc:
+    except BaseException as exc:
         assert exc.args == ("point() missing 2 required url params: 'city', 'country'",)
