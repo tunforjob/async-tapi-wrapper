@@ -13,10 +13,8 @@ with open("README.md", "r", encoding="utf8") as fh:
 
 package = "tapi2"
 
-test_requirements = [
-    'responses>=0.5',
-    'mock>=1.3,<1.4'
-]
+test_requirements = ["responses>=0.5", "mock>=1.3,<1.4"]
+
 
 def get_version(package):
     """
@@ -31,17 +29,17 @@ def get_version(package):
 setup(
     name="tapi-wrapper2",
     version=get_version(package),
-    description='Python API client generator',
+    description="Python API client generator",
     long_description=readme,
-    long_description_content_type='text/markdown',
-    author='Filipe Ximenes',
-    author_email='filipeximenes@gmail.com',
+    long_description_content_type="text/markdown",
+    author="Filipe Ximenes",
+    author_email="filipeximenes@gmail.com",
     url="https://github.com/pavelmaksimov/tapi-wrapper",
     packages=[package],
     include_package_data=True,
-    install_requires=['requests'],
+    install_requires=["requests"],
     license="MIT",
     zip_safe=False,
     keywords="tapi,wrapper,api",
-    python_requires='>=3.5',
+    python_requires=">=3.5",
 )

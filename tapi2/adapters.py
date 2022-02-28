@@ -144,7 +144,7 @@ class TapiAdapter:
         kwargs["data"] = self.format_data_to_request(serialized)
         return kwargs
 
-    def get_error_message(self, data, response=None):
+    async def get_error_message(self, data, response=None):
         """Get error from response."""
         return str(data)
 
@@ -258,9 +258,9 @@ class JSONAdapterMixin:
         except json.JSONDecodeError:
             return response.text
 
-    def get_error_message(self, data, response=None):
-        if not data and response.content.strip():
-            data = json.loads(response.content.decode())
+    async def get_error_message(self, data, response=None):
+        if not data and response:
+            data = await response.json()
 
         if data:
             return data.get("error", None)

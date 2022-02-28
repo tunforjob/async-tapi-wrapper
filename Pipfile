@@ -7,6 +7,11 @@ name = "pypi"
 aiohttp = "*"
 
 [dev-packages]
+black = "*"
+aiounittest = "*"
+pytest = "*"
+pytest-asyncio = "*"
+aioresponses = "*"
 
 [requires]
 python_version = "3.10"

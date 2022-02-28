@@ -371,7 +371,9 @@ class TapiClientExecutor(TapiClient):
             context = self._context(
                 response=response, request_kwargs=request_kwargs, client=client
             )
-            error_message = self._api.get_error_message(data=e.data, response=response)
+            error_message = await self._api.get_error_message(
+                data=e.data, response=response
+            )
             tapi_exception = e.tapi_exception(message=error_message, client=client)
 
             should_refresh_token = (
@@ -453,7 +455,7 @@ class TapiClientExecutor(TapiClient):
         reached_item_limit = max_items is not None and max_items <= item_count
         return reached_page_limit or reached_item_limit
 
-    def iter_items(self, max_pages=None, max_items=None):
+    async def iter_items(self, max_pages=None, max_items=None):
         executor = self
         iterator_list = executor._get_iterator_iteritems()
         page_count = 0
@@ -478,13 +480,13 @@ class TapiClientExecutor(TapiClient):
             if not next_request_kwargs:
                 break
 
-            request_method = executor._response.request.method.lower()
+            request_method = executor.response.method.lower()
             method = getattr(self, request_method)
-            response = method(**next_request_kwargs)
+            response = await method(**next_request_kwargs)
             executor = response()
             iterator_list = executor._get_iterator_iteritems()
 
-    def pages(self, max_pages=None):
+    async def pages(self, max_pages=None):
         executor = self
         pages = executor._get_iterator_pages()
         page_count = 0
@@ -493,9 +495,7 @@ class TapiClientExecutor(TapiClient):
             for page in pages:
                 if self._reached_max_limits(page_count, None, max_pages, None):
                     break
-
                 yield self._wrap_in_tapi(page)
-
                 page_count += 1
 
             next_request_kwargs = executor._get_iterator_next_request_kwargs()
@@ -505,9 +505,9 @@ class TapiClientExecutor(TapiClient):
             ):
                 break
 
-            request_method = executor._response.request.method.lower()
+            request_method = executor.response.method.lower()
             method = getattr(self, request_method)
-            response = method(**next_request_kwargs)
+            response = await method(**next_request_kwargs)
             executor = response()
             pages = executor._get_iterator_pages()
 
