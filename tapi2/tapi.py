@@ -17,15 +17,6 @@ class TapiInstantiator:
         self, serializer_class=None, session=None, resource_mapping=None, **kwargs
     ):
         refresh_token_default = kwargs.pop("refresh_token_by_default", False)
-        # async with TapiClient(
-        #     self.adapter_class(
-        #         serializer_class=serializer_class,
-        #         resource_mapping=resource_mapping,
-        #     ),
-        #     api_params=kwargs,
-        #     refresh_token_by_default=refresh_token_default,
-        #     session=session,
-        # ) as client:
         return TapiClient(
             self.adapter_class(
                 serializer_class=serializer_class,
@@ -101,21 +92,6 @@ class TapiClient:
         request_kwargs = kwargs.pop("request_kwargs", self._request_kwargs)
         response = kwargs.pop("response", self._response)
         resource_name = kwargs.pop("resource_name", self._resource_name)
-        # async with TapiClient(
-        #     self._instatiate_api(),
-        #     data=data,
-        #     api_params=self._api_params,
-        #     response=response,
-        #     request_kwargs=request_kwargs,
-        #     refresh_token_by_default=self._refresh_token_default,
-        #     refresh_data=self._refresh_data,
-        #     resource_name=resource_name,
-        #     session=self._session,
-        #     store=self.store,
-        #     *args,
-        #     **kwargs,
-        # ) as client:
-        #     result = await client
         return TapiClient(
             self._instatiate_api(),
             data=data,
@@ -133,20 +109,6 @@ class TapiClient:
 
     def _wrap_in_tapi_executor(self, data, *args, **kwargs):
         request_kwargs = kwargs.pop("request_kwargs", self._request_kwargs)
-        # async with TapiClientExecutor(
-        #     self._instatiate_api(),
-        #     data=data,
-        #     api_params=self._api_params,
-        #     request_kwargs=request_kwargs,
-        #     refresh_token_by_default=self._refresh_token_default,
-        #     refresh_data=self._refresh_data,
-        #     resource_name=self._resource_name,
-        #     session=self._session,
-        #     store=self.store,
-        #     *args,
-        #     **kwargs,
-        # ) as client:
-        #     result = await client
         return TapiClientExecutor(
             self._instatiate_api(),
             data=data,
@@ -185,9 +147,6 @@ class TapiClient:
                 self._data, url_params, self._resource_name
             )
 
-        # return await self._wrap_in_tapi_executor(
-        #     data, resource=self._resource, response=self._response
-        # )
         return self._wrap_in_tapi_executor(
             data, resource=self._resource, response=self._response
         )
@@ -309,8 +268,6 @@ class TapiClientExecutor(TapiClient):
             return self._api._get_to_native_method(name, self._data, **self._context())
         raise AttributeError(name)
 
-    # async def __call__(self, *args, **kwargs):
-    #     return await self._wrap_in_tapi(self._data.__call__(*args, **kwargs))
     def __call__(self, *args, **kwargs):
         return self._wrap_in_tapi(self._data.__call__(*args, **kwargs))
 
@@ -409,9 +366,6 @@ class TapiClientExecutor(TapiClient):
                 tapi_exception, error_message, repeat_number, **context
             )
 
-        # return await self._wrap_in_tapi(
-        #     response_data, response=response, request_kwargs=request_kwargs
-        # )
         return self._wrap_in_tapi(
             response_data, response=response, request_kwargs=request_kwargs
         )
@@ -551,7 +505,6 @@ class TapiClientExecutor(TapiClient):
             print("Available query parameters:")
             pprint(self._resource["params"])
 
-        # return await self._wrap_in_tapi(self._resource)
         return self._wrap_in_tapi(self._resource)
 
     def __dir__(self):
