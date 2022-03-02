@@ -1,5 +1,5 @@
-from tapi2.adapters import TapiAdapter, JSONAdapterMixin, generate_wrapper_from_adapter
-from tapi2.serializers import SimpleSerializer
+from async_tapi.adapters import TapiAdapter, JSONAdapterMixin, generate_wrapper_from_adapter
+from async_tapi.serializers import SimpleSerializer
 
 RESOURCE_MAPPING = {
     "test": {"resource": "test/", "docs": "http://www.test.com"},

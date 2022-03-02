@@ -1,7 +1,7 @@
 import pytest
 from aioresponses import aioresponses, CallbackResult
 
-from tapi2.exceptions import ClientError
+from async_tapi.exceptions import ClientError
 from tests.client import TesterClient, TokenRefreshClient, FailTokenRefreshClient
 
 

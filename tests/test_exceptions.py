@@ -2,13 +2,13 @@ import aiohttp
 import pytest
 from aioresponses import aioresponses
 
-from tapi2.exceptions import (
+from async_tapi.exceptions import (
     ClientError,
     ServerError,
     ResponseProcessException,
     TapiException,
 )
-from tapi2.tapi import TapiClient
+from async_tapi.tapi import TapiClient
 
 from tests.client import TesterClient, TesterClientAdapter as ClientAdapter
 

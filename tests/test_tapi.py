@@ -1,8 +1,8 @@
 import pytest
 from aioresponses import aioresponses, CallbackResult
 
-from tapi2.adapters import Resource
-from tapi2.exceptions import ClientError, ServerError
+from async_tapi.adapters import Resource
+from async_tapi.exceptions import ClientError, ServerError
 from tests.client import TesterClient
 
 

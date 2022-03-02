@@ -1,6 +1,6 @@
 import pytest
 
-from tapi2.adapters import TapiAdapter
+from async_tapi.adapters import TapiAdapter
 
 
 def test_fill_resource_template_url():

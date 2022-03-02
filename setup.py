@@ -11,7 +11,7 @@ import re
 with open("README.md", "r", encoding="utf8") as fh:
     readme = fh.read()
 
-package = "tapi2"
+package = "async_tapi"
 
 
 def get_version(package):
@@ -25,7 +25,7 @@ def get_version(package):
 
 
 setup(
-    name="tapi-wrapper2",
+    name="async-tapi-wrapper",
     version=get_version(package),
     description="Python API client generator",
     long_description=readme,
@@ -46,6 +46,6 @@ setup(
     },
     license="MIT",
     zip_safe=False,
-    keywords="tapi,wrapper,api",
+    keywords="tapi,wrapper,api,async",
     python_requires=">=3.5",
 )
