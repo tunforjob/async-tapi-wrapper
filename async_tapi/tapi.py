@@ -490,22 +490,29 @@ class TapiClientExecutor(TapiClient):
         if not self._resource:
             raise KeyError("Resource {} not registered".format(self._resource))
 
-        print("Documentation: {}".format(self._resource["docs"]))
-        print("Resource path: {}".format(self._resource["resource"]))
+        help_info = ""
+
+        if self._resource.get("docs"):
+            help_info += "Documentation: {}".format(self._resource["docs"])
+
+        if self._resource.get("resource"):
+            help_info += "\nResource path: {}".format(self._resource["resource"])
 
         if self._resource.get("description"):
-            print("Description:")
-            print(self._resource["description"])
+            help_info += "\nDescription:"
+            help_info += "\n{}".format(self._resource["description"])
 
         if self._resource.get("methods"):
-            print("Available HTTP methods:")
-            print(self._resource["methods"])
+            help_info += "\nAvailable HTTP methods:"
+            help_info += "\n{}".format(self._resource["methods"])
 
         if self._resource.get("params"):
-            print("Available query parameters:")
-            pprint(self._resource["params"])
+            help_info += "\nAvailable query parameters:"
+            help_info += "\n{}".format(self._resource["params"])
 
-        return self._wrap_in_tapi(self._resource)
+        print(help_info)
+
+        return help_info
 
     def __dir__(self):
         methods = [
