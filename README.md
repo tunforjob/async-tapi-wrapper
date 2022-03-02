@@ -1,8 +1,10 @@
-# Tapi-Wrapper
+# Async-Tapi-Wrapper
 ![Supported Python Versions](https://img.shields.io/static/v1?label=python&message=>=3.6&color=blue)
 [![GitHub license](https://img.shields.io/badge/license-MIT-green.svg)](https://raw.githubusercontent.com/vintasoftware/tapioca-wrapper/master/LICENSE)
 [![Downloads](https://pepy.tech/badge/tapi-wrapper)](https://pepy.tech/project/tapi-yandex-metrika)
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+
+It's an async fork of [tapi-wrapper](https://github.com/pavelmaksimov/tapi-wrapper) library.
 
 Tapioca helps you generating Python clients for APIs.
 APIs wrapped by Tapioca are explorable and follow a simple interaction pattern that works uniformly so developers don't need to learn how to use a new coding interface/style for each service API.
@@ -15,7 +17,7 @@ APIs wrapped by Tapioca are explorable and follow a simple interaction pattern t
 
 
 ### Installed
-    pip install tapi-wrapper2==0.1.2
+    pip install async-tapi-wrapper
 
 
 ### Help

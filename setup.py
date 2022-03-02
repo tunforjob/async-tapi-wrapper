@@ -47,5 +47,5 @@ setup(
     license="MIT",
     zip_safe=False,
     keywords="tapi,wrapper,api,async",
-    python_requires=">=3.5",
+    python_requires=">=3.6",
 )
