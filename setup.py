@@ -32,7 +32,7 @@ setup(
     long_description_content_type="text/markdown",
     author="Filipe Ximenes",
     author_email="filipeximenes@gmail.com",
-    url="https://github.com/Scronullik/async-tapi-wrapper",
+    url="https://github.com/ilindrey/async-tapi-wrapper",
     packages=[package],
     include_package_data=True,
     install_requires=["aiohttp"],
