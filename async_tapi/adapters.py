@@ -256,7 +256,7 @@ class JSONAdapterMixin:
         try:
             return await response.json()
         except json.JSONDecodeError:
-            return response.text
+            return await response.text()
 
     async def get_error_message(self, data, response=None):
         if not data and response:
