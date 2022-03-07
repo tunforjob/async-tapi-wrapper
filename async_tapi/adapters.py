@@ -80,7 +80,6 @@ class TapiAdapter:
         base_attributes = {
             *dir(TapiAdapter),
             *dir(TapiClientExecutor),
-            *dir(JSONAdapterMixin),
             "serializer",
         }
         a = [
@@ -236,6 +235,22 @@ class TapiAdapter:
 
 
 class JSONAdapterMixin:
+
+    @property
+    def native_methods(self):
+        """Make custom attributes and methods to native"""
+        attributes = super().native_methods
+        base_attributes = {
+            *dir(JSONAdapterMixin),
+        }
+        a = [
+            attr
+            for attr in dir(self)
+            if not attr.startswith("_") and attr not in base_attributes
+        ]
+        attributes.extend(a)
+        return attributes
+
     def get_request_kwargs(self, api_params, *args, **kwargs):
         request_kwargs = super(JSONAdapterMixin, self).get_request_kwargs(
             api_params, *args, **kwargs
