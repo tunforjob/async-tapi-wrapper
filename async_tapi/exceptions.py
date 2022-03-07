@@ -2,10 +2,10 @@ class ResponseProcessException(Exception):
     def __init__(self, tapi_exception, data, *args, **kwargs):
         self.tapi_exception = tapi_exception
         self.data = data
-        super(ResponseProcessException, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
-class TapiException(Exception):
+class TAPIException(Exception):
     def __init__(self, message, client):
         self.status = None
         self.client = client
@@ -14,19 +14,19 @@ class TapiException(Exception):
 
         if not message:
             message = "response status code: {}".format(self.status)
-        super(TapiException, self).__init__(message)
+        super().__init__(message)
 
 
-class ClientError(TapiException):
+class ClientError(TAPIException):
     def __init__(self, message="", client=None):
-        super(ClientError, self).__init__(message, client=client)
+        super().__init__(message, client=client)
 
 
-class ServerError(TapiException):
+class ServerError(TAPIException):
     def __init__(self, message="", client=None):
-        super(ServerError, self).__init__(message, client=client)
+        super().__init__(message, client=client)
 
 
-class NotFound404Error(TapiException):
+class NotFound404Error(TAPIException):
     def __init__(self, message="Error 404 page not found", client=None):
-        super(NotFound404Error, self).__init__(message, client=client)
+        super().__init__(message, client=client)

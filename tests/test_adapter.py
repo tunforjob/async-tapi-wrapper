@@ -1,10 +1,10 @@
 import pytest
 
-from async_tapi.adapters import TapiAdapter
+from async_tapi.adapters import TAPIAdapter
 
 
 def test_fill_resource_template_url():
-    adapter = TapiAdapter()
+    adapter = TAPIAdapter()
 
     template = "{country}/{city}"
     resource = "point"
@@ -19,7 +19,7 @@ def test_fill_resource_template_url():
 
 
 def test_fill_resource_template_url_exception():
-    adapter = TapiAdapter()
+    adapter = TAPIAdapter()
 
     template = "{country}/{city}"
     resource = "point"

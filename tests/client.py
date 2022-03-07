@@ -1,8 +1,4 @@
-from async_tapi.adapters import (
-    TapiAdapter,
-    JSONAdapterMixin,
-    generate_wrapper_from_adapter,
-)
+from async_tapi.adapters import TAPIAdapter, generate_wrapper_from_adapter
 from async_tapi.serializers import SimpleSerializer
 
 RESOURCE_MAPPING = {
@@ -21,7 +17,7 @@ RESOURCE_MAPPING = {
 }
 
 
-class TesterClientAdapter(JSONAdapterMixin, TapiAdapter):
+class TesterClientAdapter(TAPIAdapter):
     serializer_class = None
     api_root = "https://api.test.com"
     resource_mapping = RESOURCE_MAPPING

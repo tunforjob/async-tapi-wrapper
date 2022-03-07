@@ -6,15 +6,15 @@ from async_tapi.exceptions import (
     ClientError,
     ServerError,
     ResponseProcessException,
-    TapiException,
+    TAPIException,
 )
-from async_tapi.tapi import TapiClient
+from async_tapi.tapi import TAPIClient
 
 from tests.client import TesterClient, TesterClientAdapter as ClientAdapter
 
 
 """
-test TapiException
+test TAPIException
 """
 
 
@@ -29,9 +29,9 @@ async def test_exception_contain_tapi_client():
             )
             try:
                 await client.test().get()
-            except TapiException as e:
+            except TAPIException as e:
                 exception = e
-            assert exception.client.__class__ is TapiClient
+            assert exception.client.__class__ is TAPIClient
 
 
 async def test_exception_contain_status_code():
@@ -45,7 +45,7 @@ async def test_exception_contain_status_code():
             )
             try:
                 await client.test().get()
-            except TapiException as e:
+            except TAPIException as e:
                 exception = e
             assert exception.status == 400
 
@@ -62,7 +62,7 @@ async def test_exception_message():
 
             try:
                 await client.test().get()
-            except TapiException as e:
+            except TAPIException as e:
                 exception = e
             assert str(exception) == "response status code: 400"
 

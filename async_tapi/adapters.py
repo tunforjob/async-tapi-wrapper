@@ -9,11 +9,11 @@ from .exceptions import (
     NotFound404Error,
 )
 from .serializers import SimpleSerializer
-from .tapi import TapiInstantiator, TapiClientExecutor
+from .tapi import TAPIInstaller, TAPIClientExecutor
 
 
 def generate_wrapper_from_adapter(adapter_class):
-    return TapiInstantiator(adapter_class)
+    return TAPIInstaller(adapter_class)
 
 
 class Resource:
@@ -57,7 +57,7 @@ class Resource:
         return self.dict()[item]
 
 
-class TapiAdapter:
+class BaseTAPIAdapter:
     serializer_class = SimpleSerializer
     api_root = NotImplementedError
     resource_mapping: dict = NotImplementedError
@@ -78,8 +78,8 @@ class TapiAdapter:
     def native_methods(self):
         """Make custom attributes and methods to native"""
         base_attributes = {
-            *dir(TapiAdapter),
-            *dir(TapiClientExecutor),
+            *dir(BaseTAPIAdapter),
+            *dir(TAPIClientExecutor),
             "serializer",
         }
         a = [
@@ -252,7 +252,7 @@ class JSONAdapterMixin:
         return attributes
 
     def get_request_kwargs(self, api_params, *args, **kwargs):
-        request_kwargs = super(JSONAdapterMixin, self).get_request_kwargs(
+        request_kwargs = super().get_request_kwargs(
             api_params, *args, **kwargs
         )
         request_kwargs["headers"] = {
@@ -279,3 +279,7 @@ class JSONAdapterMixin:
 
         if data:
             return data.get("error", None)
+
+
+class TAPIAdapter(JSONAdapterMixin, BaseTAPIAdapter):
+    pass

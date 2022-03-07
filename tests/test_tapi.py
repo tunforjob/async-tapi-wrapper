@@ -7,7 +7,7 @@ from tests.client import TesterClient
 
 
 """
-tests TapiClient
+tests TAPIClient
 """
 
 
@@ -133,7 +133,7 @@ async def test_fill_url_from_default_params():
 
 
 """
-tests TapiExecutor
+tests TAPIExecutor
 """
 
 
@@ -237,7 +237,7 @@ async def test_response_executor_has_a_status_code():
 
 
 """
-tests TapiExecutorRequests
+tests TAPIExecutorRequests
 """
 
 

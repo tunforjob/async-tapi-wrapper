@@ -3,21 +3,19 @@ import json
 import aiohttp
 import webbrowser
 from collections import OrderedDict
-from pprint import pprint
 
 from .exceptions import ResponseProcessException
 
 
-class TapiInstantiator:
+class TAPIInstaller:
     def __init__(self, adapter_class):
         self.adapter_class = adapter_class
-        self
 
     def __call__(
         self, serializer_class=None, session=None, resource_mapping=None, **kwargs
     ):
         refresh_token_default = kwargs.pop("refresh_token_by_default", False)
-        return TapiClient(
+        return TAPIClient(
             self.adapter_class(
                 serializer_class=serializer_class,
                 resource_mapping=resource_mapping,
@@ -28,7 +26,7 @@ class TapiInstantiator:
         )
 
 
-class TapiClient:
+class TAPIClient:
     def __init__(
         self,
         api,
@@ -82,7 +80,7 @@ class TapiClient:
     def status(self):
         return self.response.status
 
-    def _instatiate_api(self):
+    def _satiate_api(self):
         serializer_class = None
         if self._api.serializer:
             serializer_class = self._api.serializer.__class__
@@ -92,8 +90,8 @@ class TapiClient:
         request_kwargs = kwargs.pop("request_kwargs", self._request_kwargs)
         response = kwargs.pop("response", self._response)
         resource_name = kwargs.pop("resource_name", self._resource_name)
-        return TapiClient(
-            self._instatiate_api(),
+        return TAPIClient(
+            self._satiate_api(),
             data=data,
             api_params=self._api_params,
             response=response,
@@ -109,8 +107,8 @@ class TapiClient:
 
     def _wrap_in_tapi_executor(self, data, *args, **kwargs):
         request_kwargs = kwargs.pop("request_kwargs", self._request_kwargs)
-        return TapiClientExecutor(
-            self._instatiate_api(),
+        return TAPIClientExecutor(
+            self._satiate_api(),
             data=data,
             api_params=self._api_params,
             request_kwargs=request_kwargs,
@@ -230,14 +228,14 @@ class TapiClient:
             )
         except NotImplementedError:
             if type(self._data) == OrderedDict:
-                return ("<{} object, printing as dict:\n" "{}>").format(
+                return "<{} object, printing as dict:\n" "{}>".format(
                     self.__class__.__name__, json.dumps(self._data, indent=4)
                 )
             else:
                 import pprint
 
                 pp = pprint.PrettyPrinter(indent=4)
-                return ("<{} object\n" "{}>").format(
+                return "<{} object\n" "{}>".format(
                     self.__class__.__name__, pp.pformat(self._data)
                 )
 
@@ -251,17 +249,17 @@ class TapiClient:
         return key in self._data
 
 
-class TapiClientExecutor(TapiClient):
+class TAPIClientExecutor(TAPIClient):
     def __init__(self, api, *args, **kwargs):
-        super(TapiClientExecutor, self).__init__(api, *args, **kwargs)
+        super().__init__(api, *args, **kwargs)
 
     def __getitem__(self, key):
         raise Exception(
-            "This operation cannot be done on a" + " TapiClientExecutor object"
+            "This operation cannot be done on a" + " TAPIClientExecutor object"
         )
 
     def __iter__(self):
-        raise Exception("Cannot iterate over a TapiClientExecutor object")
+        raise Exception("Cannot iterate over a TAPIClientExecutor object")
 
     def __getattr__(self, name):
         if name.startswith("to_") or name in self._api.native_methods:
@@ -404,7 +402,8 @@ class TapiClientExecutor(TapiClient):
     def _get_iterator_items(self):
         return self._api.get_iterator_items(data=self._data, **self._context())
 
-    def _reached_max_limits(self, page_count, item_count, max_pages, max_items):
+    @staticmethod
+    def _reached_max_limit(page_count, item_count, max_pages, max_items):
         reached_page_limit = max_pages is not None and max_pages <= page_count
         reached_item_limit = max_items is not None and max_items <= item_count
         return reached_page_limit or reached_item_limit
@@ -416,11 +415,11 @@ class TapiClientExecutor(TapiClient):
         item_count = 0
 
         while iterator_list:
-            if self._reached_max_limits(page_count, item_count, max_pages, max_items):
+            if self._reached_max_limit(page_count, item_count, max_pages, max_items):
                 break
 
             for item in iterator_list:
-                if self._reached_max_limits(
+                if self._reached_max_limit(
                     page_count, item_count, max_pages, max_items
                 ):
                     break
@@ -447,14 +446,14 @@ class TapiClientExecutor(TapiClient):
 
         while pages:
             for page in pages:
-                if self._reached_max_limits(page_count, None, max_pages, None):
+                if self._reached_max_limit(page_count, None, max_pages, None):
                     break
                 yield self._wrap_in_tapi(page)
                 page_count += 1
 
             next_request_kwargs = executor._get_iterator_next_request_kwargs()
 
-            if not next_request_kwargs or self._reached_max_limits(
+            if not next_request_kwargs or self._reached_max_limit(
                 page_count, None, max_pages, None
             ):
                 break
@@ -470,7 +469,7 @@ class TapiClientExecutor(TapiClient):
         item_count = 0
 
         for item in items:
-            if self._reached_max_limits(None, item_count, None, max_items):
+            if self._reached_max_limit(None, item_count, None, max_items):
                 break
             yield item
             item_count += 1
@@ -516,7 +515,7 @@ class TapiClientExecutor(TapiClient):
 
     def __dir__(self):
         methods = [
-            m for m in TapiClientExecutor.__dict__.keys() if not m.startswith("_")
+            m for m in TAPIClientExecutor.__dict__.keys() if not m.startswith("_")
         ]
         methods += [m for m in dir(self._api.serializer) if m.startswith("to_")]
         methods += self._api.native_methods
