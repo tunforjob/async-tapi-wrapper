@@ -52,11 +52,11 @@ class TAPIClient:
         self._resource_name = resource_name
         self._refresh_token_default = refresh_token_by_default
         self._refresh_data = refresh_data
-        self._session = session or aiohttp.ClientSession()
+        self._session = session
         self.store = store or {}
 
     async def __aenter__(self):
-        if self._session is not None:
+        if self._session is None:
             self._session = aiohttp.ClientSession()
         return self
 
