@@ -11,7 +11,7 @@ APIs wrapped by Tapioca are explorable and follow a simple interaction pattern t
 
 
 ### Api examples
-[Yandex Metrika API](https://github.com/pavelmaksimov/tapi-yandex-metrika)
+[Async Yandex Metrika API](https://github.com/ilindrey/async-tapi-yandex-metrika)
 
 [Yandex Direct API](https://github.com/pavelmaksimov/tapi-yandex-direct)
 
@@ -19,10 +19,59 @@ APIs wrapped by Tapioca are explorable and follow a simple interaction pattern t
 ### Installed
     pip install async-tapi-wrapper
 
+### Usage
+
+First, you need to set up the mapping of the resources you want to work with:
+
+```python
+RESOURCE_MAPPING = {
+    "test": {
+        "resource": "test/{number}/",
+        "docs": "http://test.com/docs",
+        "spam": "eggs",
+        "foo": "bar",
+    },
+}
+```
+
+Then create an adapter class that will work with resources:
+```python
+from async_tapi.adapters import TAPIAdapter
+
+class TestClientAdapter(TAPIAdapter):
+    serializer_class = ...  # default SimpleSerializer
+    api_root = "https://api.test.com"
+    resource_mapping = RESOURCE_MAPPING
+```
+
+Generate a class-based wrapper using `generate_wrapper_from_adapter`:
+```python
+from async_tapi.adapters import generate_wrapper_from_adapter
+
+TestClient = generate_wrapper_from_adapter(TestClientAdapter)
+```
+
+Using:
+
+```python
+async with TestClient(**some_params) as client:
+    response = await client.test(number=...).get(params=...)
+```
+
+You can also specify a resource mapping and serializer when creating an instance of the class:
+```python
+
+async with TestClient(resource_mapping=RESOURCE_MAPPING, 
+                      serializer_class=..., 
+                      **some_params,
+                      ) as client:
+    ...
+```
 
 ### Help
-[Телеграм](https://t.me/pavel_maksimow),
-[Facebook](https://www.facebook.com/pavel.maksimow)
+Telegram: [Pavel Maksimow](https://t.me/pavel_maksimow), [Andrey Ilin](https://t.me/ilindrey)
+
+Facebook: [Pavel Maksimow](https://www.facebook.com/pavel.maksimow)
 
 ### Authors
 The author of this modification Pavel Maksimov
