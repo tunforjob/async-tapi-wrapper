@@ -1,5 +1,6 @@
 import json
 import re
+from aiohttp.client_exceptions import ContentTypeError
 from typing import List
 
 from .exceptions import (
@@ -270,6 +271,12 @@ class JSONAdapterMixin:
     async def response_to_native(self, response):
         try:
             return await response.json()
+        except ContentTypeError:
+            text = await response.text()
+            try:
+                return json.loads(text)
+            except json.JSONDecodeError:
+                return text
         except json.JSONDecodeError:
             return await response.text()
 
