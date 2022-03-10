@@ -261,7 +261,6 @@ class JSONAdapterMixin:
             **api_params.get("headers", {}),
             **request_kwargs.get("headers", {}),
         }
-
         return request_kwargs
 
     def format_data_to_request(self, data):
@@ -282,10 +281,15 @@ class JSONAdapterMixin:
 
     async def get_error_message(self, data, response=None):
         if not data and response:
-            data = await response.json()
+            data = await self.response_to_native(response)
 
         if data:
-            return data.get("error", None)
+            if "error" in data:
+                return data.get("error")
+            elif "errors" in data:
+                return data.get("errors")
+            else:
+                return data
 
 
 class TAPIAdapter(JSONAdapterMixin, BaseTAPIAdapter):
