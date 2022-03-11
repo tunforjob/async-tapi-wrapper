@@ -55,7 +55,18 @@ Using:
 
 ```python
 async with TestClient(**some_params) as client:
-    response = await client.test(number=...).get(params=...)
+    
+    response = await client.test(number=...).get(data=..., 
+                                                 params=...,
+                                                 debug=True)
+    
+    response = await client.test(number=...).post(data=..., 
+                                                  params=..., 
+                                                  debug=True)
+    
+    responses = await client.test(number=...).post_batch(data=[..., ...], 
+                                                         params=..., 
+                                                         debug=True)
 ```
 
 You can also specify a resource mapping and serializer when creating an instance of the class:
