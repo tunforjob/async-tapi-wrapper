@@ -414,9 +414,6 @@ class TAPIClientExecutor(TAPIClient):
     async def delete(self, *args, **kwargs):
         return await self._send("DELETE", *args, **kwargs)
 
-    async def get_batch(self, *args, **kwargs):
-        return await self._send_batch("GET", *args, **kwargs)
-
     async def post_batch(self, *args, **kwargs):
         return await self._send_batch("POST", *args, **kwargs)
 
