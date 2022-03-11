@@ -369,7 +369,7 @@ class TAPIClientExecutor(TAPIClient):
             response_data, response=response, request_kwargs=request_kwargs
         )
 
-    async def _make_request_batch(self, request_method, *args, **kwargs):
+    async def _send(self, request_method, *args, **kwargs):
         debug = kwargs.pop("debug") if "debug" in kwargs else False
         response = await self._make_request(request_method, *args, **kwargs)
         if debug:
@@ -387,7 +387,7 @@ class TAPIClientExecutor(TAPIClient):
         async with asyncio.Semaphore(semaphore):
             results = await asyncio.gather(
                 *[
-                    self._make_request_batch(
+                    self._send(
                         request_method, *args, **{**kwargs, "data": row}
                     )
                     for row in data
@@ -397,22 +397,22 @@ class TAPIClientExecutor(TAPIClient):
         return results
 
     async def get(self, *args, **kwargs):
-        return await self._make_request("GET", *args, **kwargs)
+        return await self._send("GET", *args, **kwargs)
 
     async def post(self, *args, **kwargs):
-        return await self._make_request("POST", *args, **kwargs)
+        return await self._send("POST", *args, **kwargs)
 
     async def options(self, *args, **kwargs):
-        return await self._make_request("OPTIONS", *args, **kwargs)
+        return await self._send("OPTIONS", *args, **kwargs)
 
     async def put(self, *args, **kwargs):
-        return await self._make_request("PUT", *args, **kwargs)
+        return await self._send("PUT", *args, **kwargs)
 
     async def patch(self, *args, **kwargs):
-        return await self._make_request("PATCH", *args, **kwargs)
+        return await self._send("PATCH", *args, **kwargs)
 
     async def delete(self, *args, **kwargs):
-        return await self._make_request("DELETE", *args, **kwargs)
+        return await self._send("DELETE", *args, **kwargs)
 
     async def get_batch(self, *args, **kwargs):
         return await self._send_batch("GET", *args, **kwargs)
