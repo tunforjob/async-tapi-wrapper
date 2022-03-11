@@ -387,9 +387,7 @@ class TAPIClientExecutor(TAPIClient):
         async with asyncio.Semaphore(semaphore):
             results = await asyncio.gather(
                 *[
-                    self._send(
-                        request_method, *args, **{**kwargs, "data": row}
-                    )
+                    self._send(request_method, *args, **{**kwargs, "data": row})
                     for row in data
                 ]
             )
