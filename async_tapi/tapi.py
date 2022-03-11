@@ -417,9 +417,6 @@ class TAPIClientExecutor(TAPIClient):
     async def post_batch(self, *args, **kwargs):
         return await self._send_batch("POST", *args, **kwargs)
 
-    async def options_batch(self, *args, **kwargs):
-        return await self._send_batch("OPTIONS", *args, **kwargs)
-
     async def put_batch(self, *args, **kwargs):
         return await self._send_batch("PUT", *args, **kwargs)
 
