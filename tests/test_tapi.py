@@ -556,3 +556,160 @@ async def test_simple_pages_max_item_zero_iterator():
                 iterations_count += 1
 
             assert iterations_count == 0
+
+
+"""
+tests batch methods
+"""
+
+
+async def test_post_batch():
+    data = [
+        {"data": [{"key": "value"}]},
+        {"data": [{"key": "value"}]},
+        {"data": [{"key": "value"}]},
+    ]
+    async with TesterClient() as client:
+        with aioresponses() as mocked:
+
+            mocked.post(
+                client.test().data,
+                body='{"data": [{"key": "value"}]}',
+                status=200,
+                content_type="application/json",
+            )
+
+            mocked.post(
+                client.test().data,
+                body='{"data": [{"key": "value"}]}',
+                status=200,
+                content_type="application/json",
+            )
+
+            mocked.post(
+                client.test().data,
+                body='{"data": [{"key": "value"}]}',
+                status=200,
+                content_type="application/json",
+            )
+
+            results = await client.test().post_batch(data=data)
+
+            for response, data_row in zip(results, data):
+                assert response.data == data_row
+
+            assert len(results) == len(data)
+
+
+async def test_put_batch():
+    data = [
+        {"data": [{"key": "value"}]},
+        {"data": [{"key": "value"}]},
+        {"data": [{"key": "value"}]},
+    ]
+    async with TesterClient() as client:
+        with aioresponses() as mocked:
+
+            mocked.put(
+                client.test().data,
+                body='{"data": [{"key": "value"}]}',
+                status=200,
+                content_type="application/json",
+            )
+
+            mocked.put(
+                client.test().data,
+                body='{"data": [{"key": "value"}]}',
+                status=200,
+                content_type="application/json",
+            )
+
+            mocked.put(
+                client.test().data,
+                body='{"data": [{"key": "value"}]}',
+                status=200,
+                content_type="application/json",
+            )
+
+            results = await client.test().put_batch(data=data)
+
+            for response, data_row in zip(results, data):
+                assert response.data == data_row
+
+            assert len(results) == len(data)
+
+
+async def test_patch_batch():
+    data = [
+        {"data": [{"key": "value"}]},
+        {"data": [{"key": "value"}]},
+        {"data": [{"key": "value"}]},
+    ]
+    async with TesterClient() as client:
+        with aioresponses() as mocked:
+
+            mocked.patch(
+                client.test().data,
+                body='{"data": [{"key": "value"}]}',
+                status=200,
+                content_type="application/json",
+            )
+
+            mocked.patch(
+                client.test().data,
+                body='{"data": [{"key": "value"}]}',
+                status=200,
+                content_type="application/json",
+            )
+
+            mocked.patch(
+                client.test().data,
+                body='{"data": [{"key": "value"}]}',
+                status=200,
+                content_type="application/json",
+            )
+
+            results = await client.test().patch_batch(data=data)
+
+            for response, data_row in zip(results, data):
+                assert response.data == data_row
+
+            assert len(results) == len(data)
+
+
+async def test_delete_batch():
+    data = [
+        {"data": [{"key": "value"}]},
+        {"data": [{"key": "value"}]},
+        {"data": [{"key": "value"}]},
+    ]
+    async with TesterClient() as client:
+        with aioresponses() as mocked:
+
+            mocked.delete(
+                client.test().data,
+                body='{"data": [{"key": "value"}]}',
+                status=200,
+                content_type="application/json",
+            )
+
+            mocked.delete(
+                client.test().data,
+                body='{"data": [{"key": "value"}]}',
+                status=200,
+                content_type="application/json",
+            )
+
+            mocked.delete(
+                client.test().data,
+                body='{"data": [{"key": "value"}]}',
+                status=200,
+                content_type="application/json",
+            )
+
+            results = await client.test().delete_batch(data=data)
+
+            for response, data_row in zip(results, data):
+                assert response.data == data_row
+
+            assert len(results) == len(data)
