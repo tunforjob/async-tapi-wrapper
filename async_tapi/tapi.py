@@ -1,5 +1,6 @@
 import copy
 import json
+import asyncio
 import aiohttp
 import webbrowser
 from collections import OrderedDict
@@ -368,6 +369,33 @@ class TAPIClientExecutor(TAPIClient):
             response_data, response=response, request_kwargs=request_kwargs
         )
 
+    async def _make_request_batch(self, request_method, *args, **kwargs):
+        debug = kwargs.pop("debug") if "debug" in kwargs else False
+        response = await self._make_request(request_method, *args, **kwargs)
+        if debug:
+            response_info = "status: {} - response data: {}".format(
+                response.status, response.data
+            )
+            print(response_info)
+        return response
+
+    async def _send_batch(self, request_method, *args, **kwargs):
+
+        data = kwargs.pop("data") if "data" in kwargs else []
+        semaphore = kwargs.pop("semaphore") if "semaphore" in kwargs else 1
+
+        async with asyncio.Semaphore(semaphore):
+            results = await asyncio.gather(
+                *[
+                    self._make_request_batch(
+                        request_method, *args, **{**kwargs, "data": row}
+                    )
+                    for row in data
+                ]
+            )
+
+        return results
+
     async def get(self, *args, **kwargs):
         return await self._make_request("GET", *args, **kwargs)
 
@@ -385,6 +413,24 @@ class TAPIClientExecutor(TAPIClient):
 
     async def delete(self, *args, **kwargs):
         return await self._make_request("DELETE", *args, **kwargs)
+
+    async def get_batch(self, *args, **kwargs):
+        return await self._send_batch("GET", *args, **kwargs)
+
+    async def post_batch(self, *args, **kwargs):
+        return await self._send_batch("POST", *args, **kwargs)
+
+    async def options_batch(self, *args, **kwargs):
+        return await self._send_batch("OPTIONS", *args, **kwargs)
+
+    async def put_batch(self, *args, **kwargs):
+        return await self._send_batch("PUT", *args, **kwargs)
+
+    async def patch_batch(self, *args, **kwargs):
+        return await self._send_batch("PATCH", *args, **kwargs)
+
+    async def delete_batch(self, *args, **kwargs):
+        return await self._send_batch("DELETE", *args, **kwargs)
 
     def _get_iterator_next_request_kwargs(self):
         return self._api.get_iterator_next_request_kwargs(

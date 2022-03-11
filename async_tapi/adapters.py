@@ -236,7 +236,6 @@ class BaseTAPIAdapter:
 
 
 class JSONAdapterMixin:
-
     @property
     def native_methods(self):
         """Make custom attributes and methods to native"""
@@ -253,9 +252,7 @@ class JSONAdapterMixin:
         return attributes
 
     def get_request_kwargs(self, api_params, *args, **kwargs):
-        request_kwargs = super().get_request_kwargs(
-            api_params, *args, **kwargs
-        )
+        request_kwargs = super().get_request_kwargs(api_params, *args, **kwargs)
         request_kwargs["headers"] = {
             "Content-Type": "application/json",
             **api_params.get("headers", {}),
