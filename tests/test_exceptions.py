@@ -23,7 +23,7 @@ async def test_exception_contain_tapi_client():
         with aioresponses() as mocked:
             mocked.get(
                 client.test().data,
-                body='{"data": {"key": "value"}}',
+                body='',
                 status=400,
                 content_type="application/json",
             )
@@ -39,7 +39,7 @@ async def test_exception_contain_status_code():
         with aioresponses() as mocked:
             mocked.get(
                 client.test().data,
-                body='{"data": {"key": "value"}}',
+                body='',
                 status=400,
                 content_type="application/json",
             )
@@ -55,7 +55,7 @@ async def test_exception_message():
         with aioresponses() as mocked:
             mocked.get(
                 client.test().data,
-                body='{"data": {"key": "value"}}',
+                body='',
                 status=400,
                 content_type="application/json",
             )
